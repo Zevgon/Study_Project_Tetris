@@ -15,7 +15,7 @@ Tetris is a classic game that involves fitting blocks together. You start with a
 
 The UI of Tetris will consist of one screen displaying the board. To the right of the board will be the controls, and to the left will be a link to the Github repository.
 
-![wireframes](./tetris_wireframe.png)
+![wireframes](./tetris.png)
 
 ### Architecture and Technologies
 
@@ -55,7 +55,7 @@ Structure:
 - The toString() method will probably be:
 
 ```node
-return <li ${this.className} />
+return <li class=${this.className} />
 ```
 
 - Turning logic, coordinate math

@@ -154,7 +154,6 @@ class TetrisView {
       let coordsDup = [];
       this.currentPiece.coords.forEach(coord => coordsDup.push(coord));
       let relevantCoords = coordsDup.mergeSort((a, b) => a[0] < b[0]).reverse().uniq(el => el[1]);
-      debugger;
       let squaresBelow = relevantCoords.map(coord => [coord[0] + 1, coord[1]]);
       let grid = this.grid;
       squaresBelow.forEach(square => {
