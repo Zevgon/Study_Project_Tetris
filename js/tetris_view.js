@@ -51,11 +51,17 @@ Array.prototype.uniq = function (callback) {
   return answer;
 }
 
-Array.prototype.findBy = function (callback) {
+Array.prototype.myIncludes = function (callback) {
+  let answer = false;
   this.forEach(el => {
-
+    if (callback(el)) {
+      answer = true;
+    }
   });
+
+  return answer;
 }
+
 
 function merge (arr1, arr2, callback) {
   if (callback === undefined) {
@@ -105,22 +111,20 @@ class TetrisView {
     this.el = document.getElementById('tetris-game');
     this.updateClasses = this.updateClasses.bind(this);
     this.fall = this.fall.bind(this);
-    let piece1 = new I;
-    this.currentPiece = piece1;
     this.fallenPieces = [];
-    this.highestFallenCoords = [];
     for (let i = 0; i < 10; i++) {
-      this.highestFallenCoords.push([20, i]);
     }
     this.allPieces = this.fallenPieces.concat(this.currentPiece);
-    this.updateHighestFallenCoords = this.updateHighestFallenCoords.bind(this);
     this.constructBoard();
-    this.play();
+    let piece1 = new I(this.grid);
+    this.currentPiece = piece1;
     this.moveLeft = this.moveLeft.bind(this);
     this.moveRight = this.moveRight.bind(this);
     this.clearLines = this.clearLines.bind(this);
     this.startEventListeners = this.startEventListeners.bind(this);
     this.startEventListeners();
+    this.relevantCoords = this.relevantCoords.bind(this);
+    this.render();
   }
 
   constructBoard () {
@@ -144,16 +148,9 @@ class TetrisView {
       this.updateClasses();
       this.render();
       let stop = false;
-      // this.currentPiece.coords.forEach(coord1 => {
-      //   this.highestFallenCoords.forEach(coord2 => {
-      //     if (this.isAbove(coord1, coord2)) {
-      //       stop = true;
-      //     }
-      //   });
-      // });
       let coordsDup = [];
       this.currentPiece.coords.forEach(coord => coordsDup.push(coord));
-      let relevantCoords = coordsDup.mergeSort((a, b) => a[0] < b[0]).reverse().uniq(el => el[1]);
+      let relevantCoords = this.relevantCoords();
       let squaresBelow = relevantCoords.map(coord => [coord[0] + 1, coord[1]]);
       let grid = this.grid;
       squaresBelow.forEach(square => {
@@ -164,9 +161,26 @@ class TetrisView {
       if (stop) {
         this.fallenPieces.push(this.currentPiece);
         this.clearLines();
-        this.currentPiece = new I;
+        this.currentPiece = new I(this.grid);
       }
     }, 200);
+  }
+
+  relevantCoords () {
+    let answer = [];
+    this.currentPiece.coords.forEach(coord => {
+      if (answer.myIncludes(savedCoord => savedCoord[1] === coord[1])) {
+        let savedCoord = answer.find(answerCoord => coord[1] === answerCoord[1]);
+        if (coord[0] > savedCoord[0]) {
+          let answerIdx = answer.indexOf(savedCoord);
+          answer.splice(answerIdx, 1, coord);
+        }
+      } else {
+        answer.push(coord);
+      }
+    });
+
+    return answer;
   }
 
   startEventListeners () {
@@ -214,18 +228,6 @@ class TetrisView {
       });
       this.currentPiece.coords = newCoords;
     }
-  }
-
-
-  updateHighestFallenCoords () {
-    let relevantCoords = this.currentPiece.coords.sort().uniq(el => el[1]);
-    this.highestFallenCoords.forEach((coord1, idx) => {
-      relevantCoords.forEach(coord2 => {
-        if (coord1[1] === coord2[1]) {
-          this.highestFallenCoords[idx] = coord2;
-        }
-      });
-    });
   }
 
   clearLines () {

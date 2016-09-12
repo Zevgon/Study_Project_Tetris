@@ -1,8 +1,9 @@
 class I {
-  constructor () {
+  constructor (grid) {
     this.position = 'flat';
     this.coords = [[-1, 3], [-1, 4], [-1, 5], [-1, 6]];
     this.rotateLeft = this.rotateLeft.bind(this);
+    this.grid = grid;
   }
 
   rotateLeft () {
